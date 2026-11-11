@@ -1,0 +1,167 @@
+<section class="operating-hours-page">
+  <div class="page-header">
+    <div>
+      <h1>Branch Operating Hours</h1>
+      <p>Manage opening and closing times for each branch.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadBranches()"
+      [disabled]="isLoadingBranches()"
+    >
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="message success-message">
+      <i class="pi pi-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="message error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="branch-selector-card">
+    <label for="branchSelect">Select Branch</label>
+
+    <select
+      id="branchSelect"
+      [ngModel]="selectedBranchId()"
+      (ngModelChange)="selectBranch($event ? +$event : null)"
+      [disabled]="isLoadingBranches()"
+    >
+      <option [ngValue]="null">Select a branch</option>
+
+      @for (branch of activeBranches(); track branch.branchId) {
+        <option [ngValue]="branch.branchId">
+          {{ branch.branchCode }} - {{ branch.branchName }}
+        </option>
+      }
+    </select>
+  </div>
+
+  @if (isLoadingBranches()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      Loading branches...
+    </div>
+  } @else if (selectedBranchId() === null) {
+    <div class="empty-state">
+      <i class="pi pi-building"></i>
+      <h3>Select a branch</h3>
+      <p>Select a branch to view its operating hours.</p>
+    </div>
+  } @else {
+    <div class="schedule-card">
+      <div class="card-heading">
+        <div>
+          <h2>Weekly Schedule</h2>
+          <p>
+            {{ selectedBranchName() }}
+          </p>
+        </div>
+      </div>
+
+      @if (isLoadingHours()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          Loading operating hours...
+        </div>
+      } @else {
+        <div class="schedule-list">
+          @for (day of days; track day.value) {
+            <div class="schedule-row">
+              <div class="day-name">
+                {{ day.label }}
+              </div>
+
+              @if (getOperatingHour(day.value); as hours) {
+                @if (hours.isClosed) {
+                  <span class="closed-badge">Closed</span>
+                } @else {
+                  <span class="time-range">
+                    {{ hours.openingTime?.substring(0, 5) }}
+                    -
+                    {{ hours.closingTime?.substring(0, 5) }}
+                  </span>
+                }
+
+                <span class="configured-badge">Configured</span>
+              } @else {
+                <span class="not-configured">Not configured</span>
+              }
+
+              <button type="button" class="edit-button" (click)="openForm(day.value)">
+                <i class="pi pi-pencil"></i>
+                {{ getOperatingHour(day.value) ? 'Edit' : 'Configure' }}
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    @if (showForm()) {
+      <div class="operating-hours-form">
+        <h3>
+          {{ editingOperatingHourId() === null ? 'Configure' : 'Edit' }}
+          {{ days[formDayOfWeek()].label }}
+        </h3>
+
+        <div class="form-field">
+          <label>
+            <input type="checkbox" [ngModel]="isClosed()" (ngModelChange)="isClosed.set($event)" />
+            Branch is closed on this day
+          </label>
+        </div>
+
+        @if (!isClosed()) {
+          <div class="time-fields">
+            <div class="form-field">
+              <label for="openingTime">Opening Time</label>
+              <input
+                id="openingTime"
+                type="time"
+                [ngModel]="openingTime()"
+                (ngModelChange)="openingTime.set($event)"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="closingTime">Closing Time</label>
+              <input
+                id="closingTime"
+                type="time"
+                [ngModel]="closingTime()"
+                (ngModelChange)="closingTime.set($event)"
+              />
+            </div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="cancel-button" (click)="closeForm()" [disabled]="isSaving()">
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="save-button"
+            (click)="saveOperatingHours()"
+            [disabled]="isSaving()"
+          >
+            {{ isSaving() ? 'Saving...' : 'Save Operating Hours' }}
+          </button>
+        </div>
+      </div>
+    }
+  }
+</section>

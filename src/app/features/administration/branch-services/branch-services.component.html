@@ -1,0 +1,213 @@
+<section class="branch-services-page">
+  <div class="page-header">
+    <div>
+      <h1>Branch Services</h1>
+      <p>Manage the services offered at each branch.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadBranchServices()"
+      [disabled]="isLoading()"
+    >
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="message success-message">
+      <i class="pi pi-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="message error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Branch Selection -->
+  <div class="selection-card">
+    <div class="selection-heading">
+      <i class="pi pi-building"></i>
+      <div>
+        <h2>Select Branch</h2>
+        <p>Choose a branch to manage its services.</p>
+      </div>
+    </div>
+
+    <div class="branch-selector">
+      <label for="branchSelect">Branch</label>
+
+      <select
+        id="branchSelect"
+        [ngModel]="selectedBranchId()"
+        (ngModelChange)="onBranchChange($event ? +$event : null)"
+      >
+        <option [ngValue]="null">Select a branch</option>
+
+        @for (branch of branches(); track branch.branchId) {
+          <option [ngValue]="branch.branchId">
+            {{ branch.branchCode }} - {{ branch.branchName }}
+          </option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (selectedBranchId() !== null) {
+    <!-- Assign Service -->
+    <div class="assignment-card">
+      <div class="card-heading">
+        <div>
+          <h2>Assign Service</h2>
+          <p>Add an existing service to this branch.</p>
+        </div>
+        <span class="heading-icon">
+          <i class="pi pi-plus-circle"></i>
+        </span>
+      </div>
+
+      <div class="assignment-form">
+        <div class="form-field">
+          <label for="serviceSelect">Available Service</label>
+          @if (unassignedServices().length === 0) {
+            <small>All active services have been assigned to this branch.</small>
+          }
+          <select
+            id="serviceSelect"
+            [ngModel]="selectedServiceId()"
+            (ngModelChange)="selectedServiceId.set($event ? +$event : null)"
+          >
+            <option [ngValue]="null">Select a service</option>
+
+            @for (service of unassignedServices(); track service.serviceId) {
+              <option [ngValue]="service.serviceId">
+                {{ service.serviceCode }} - {{ service.serviceName }} ({{ service.durationMinutes }}
+                minutes)
+              </option>
+            }
+          </select>
+        </div>
+        <!-- <div class="form-field"> -->
+        <button
+          type="button"
+          class="assign-button"
+          (click)="assignService()"
+          [disabled]="selectedServiceId() === null || isSaving()"
+        >
+          @if (isSaving()) {
+            <i class="pi pi-spin pi-spinner"></i>
+            Assigning...
+          } @else {
+            <i class="pi pi-plus"></i>
+            Assign Service
+          }
+        </button>
+        <!-- <span style="padding: 0.5rem"></span>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- Assigned Services -->
+    <div class="services-card">
+      <div class="card-heading">
+        <div>
+          <h2>Assigned Services</h2>
+          <p>Services configured for the selected branch.</p>
+        </div>
+
+        <span class="service-count">
+          {{ filteredBranchServices().length }}
+          {{ filteredBranchServices().length === 1 ? 'Service' : 'Services' }}
+        </span>
+      </div>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          Loading branch services...
+        </div>
+      } @else if (filteredBranchServices().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-inbox"></i>
+          <h3>No services assigned</h3>
+          <p>Use the Assign Service section above to add services.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Service Code</th>
+                <th>Service Name</th>
+                <th>Duration</th>
+                <th>Availability</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (service of filteredBranchServices(); track service.branchServiceId) {
+                <tr>
+                  <td>
+                    <span class="service-code">
+                      {{ service.serviceCode }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span class="service-name">
+                      {{ service.serviceName }}
+                    </span>
+                  </td>
+
+                  <td>{{ service.durationMinutes }} minutes</td>
+
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class.available]="service.isAvailable"
+                      [class.unavailable]="!service.isAvailable"
+                    >
+                      {{ service.isAvailable ? 'Available' : 'Unavailable' }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      class="action-button"
+                      [class.make-unavailable]="service.isAvailable"
+                      [class.make-available]="!service.isAvailable"
+                      [disabled]="isSaving()"
+                      (click)="toggleAvailability(service)"
+                    >
+                      @if (service.isAvailable) {
+                        <i class="pi pi-ban"></i>
+                        Make Unavailable
+                      } @else {
+                        <i class="pi pi-check-circle"></i>
+                        Make Available
+                      }
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  } @else if (!isLoading() && branches().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-building"></i>
+      <h3>No active branches found</h3>
+      <p>Create and activate a branch before assigning services.</p>
+    </div>
+  }
+</section>

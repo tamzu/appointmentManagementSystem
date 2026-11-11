@@ -1,0 +1,146 @@
+.customer-details-page {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 35px 20px 60px;
+}
+
+.page-heading {
+  margin-bottom: 30px;
+
+  .step-label {
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  h1 {
+    margin: 10px 0;
+    font-size: 30px;
+    color: #1e293b;
+  }
+
+  p {
+    color: #64748b;
+    line-height: 1.6;
+  }
+}
+
+.form-section {
+  background: white;
+  padding: 25px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 22px;
+
+  h2 {
+    font-size: 18px;
+    margin: 0 0 25px;
+    color: #1e293b;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  input,
+  select {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    background: white;
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgb(37 99 235 / 10%);
+    }
+  }
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+.security-note {
+  background: #eff6ff;
+  padding: 13px;
+  border-radius: 7px;
+  color: #1e40af;
+  font-size: 13px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.continue-button {
+  border: 0;
+  border-radius: 7px;
+  background: #1d4ed8;
+  color: white;
+  padding: 13px 25px;
+  font-weight: 600;
+  cursor: pointer;
+
+  span {
+    margin-left: 12px;
+  }
+
+  &:hover {
+    background: #1e40af;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-section {
+    padding: 18px;
+  }
+}
+
+.continue-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-state {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.success-state {
+  margin-top: 15px;
+  padding: 12px;
+  background: #ecfdf5;
+  color: #047857;
+  border-radius: 7px;
+  font-size: 14px;
+}

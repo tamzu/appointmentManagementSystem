@@ -1,0 +1,105 @@
+<section class="slot-selection">
+  <div class="page-heading">
+    <span class="step-label">STEP 3 OF 4</span>
+    <h1>Select Date & Time</h1>
+    <p>Choose a convenient date and available appointment time.</p>
+  </div>
+
+  @if (branch(); as selectedBranch) {
+    <div class="booking-summary">
+      <div>
+        <span>Branch</span>
+        <strong>{{ selectedBranch.branchName }}</strong>
+        <small>{{ selectedBranch.city }}</small>
+      </div>
+
+      @if (service(); as selectedService) {
+        <div>
+          <span>Service</span>
+          <strong>{{ selectedService.serviceName }}</strong>
+          <small>{{ selectedService.durationMinutes }} minutes</small>
+        </div>
+      }
+
+      <button type="button" (click)="changeService()">Change</button>
+    </div>
+  }
+
+  <div class="date-section">
+    <label for="appointmentDate">Appointment date</label>
+
+    <input
+      #dateInput
+      id="appointmentDate"
+      type="date"
+      [min]="minimumDate"
+      [value]="selectedDate()"
+      (change)="onDateChange(dateInput.value)"
+    />
+  </div>
+
+  <div class="slots-heading">
+    <h2>Available appointment times</h2>
+    <span>All times shown in South African time (SAST)</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Checking available appointment times...</p>
+    </div>
+  }
+
+  @if (errorMessage(); as error) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-circle"></i>
+      <p>{{ error }}</p>
+
+      <button type="button" (click)="loadAvailableSlots()">Try again</button>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage() && !hasAvailableSlots()) {
+    <div class="empty-state">
+      <i class="pi pi-calendar-times"></i>
+      <h3>No available appointments</h3>
+      <p>Please select another date to see available times.</p>
+    </div>
+  }
+
+  @if (!loading() && hasAvailableSlots()) {
+    <div class="slot-list">
+      @for (slot of slots(); track slot.slotId) {
+        <button
+          type="button"
+          class="slot-option"
+          [class.selected]="isSelected(slot)"
+          (click)="selectSlot(slot)"
+        >
+          <div class="slot-time">
+            <strong>{{ formatTime(slot.startDateTime) }}</strong>
+            <span>to {{ formatTime(slot.endDateTime) }}</span>
+          </div>
+
+          <div class="slot-availability">
+            <i class="pi pi-check-circle"></i>
+            Available
+          </div>
+
+          @if (isSelected(slot)) {
+            <i class="pi pi-check-circle selected-icon"></i>
+          }
+        </button>
+      }
+    </div>
+  }
+
+  @if (selectedSlot(); as slot) {
+    <div class="form-actions">
+      <button type="button" class="continue-button" (click)="continueToCustomerDetails()">
+        Continue to Customer Details
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+  }
+</section>

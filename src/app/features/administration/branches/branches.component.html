@@ -1,0 +1,409 @@
+<section class="branches-page">
+  <div class="page-header">
+    <div>
+      <h1>Branch Management</h1>
+      <p>View, search and manage bank branches.</p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="loadBranches()"
+        [disabled]="isLoading() || showForm()"
+      >
+        <i class="pi pi-refresh"></i>
+        Refresh
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="openCreateForm()"
+        [disabled]="showForm()"
+      >
+        <i class="pi pi-plus"></i>
+        Add Branch
+      </button>
+    </div>
+  </div>
+
+  @if (successMessage()) {
+    <div class="success-message">
+      <i class="pi pi-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (showForm()) {
+    <div class="branch-form-card">
+      <div class="form-header">
+        <div>
+          <h2>
+            {{ editingBranchId() ? 'Edit Branch' : 'Create Branch' }}
+          </h2>
+          <p>Enter the branch information below.</p>
+        </div>
+
+        <button type="button" class="close-button" (click)="closeForm()" [disabled]="isSaving()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <form #branchNgForm="ngForm" (ngSubmit)="saveBranch()">
+        <div class="form-section">
+          <h3>Branch Information</h3>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="branchCode">Branch Code *</label>
+              <input
+                id="branchCode"
+                name="branchCode"
+                type="text"
+                [(ngModel)]="branchForm.branchCode"
+                maxlength="20"
+                required
+                #branchCode="ngModel"
+                placeholder="e.g. JHB001"
+              />
+
+              @if (branchCode.invalid && branchCode.touched) {
+                <small class="field-error"> Branch code is required. </small>
+              }
+            </div>
+
+            <div class="form-field">
+              <label for="branchName">Branch Name *</label>
+              <input
+                id="branchName"
+                name="branchName"
+                type="text"
+                [(ngModel)]="branchForm.branchName"
+                maxlength="150"
+                required
+                #branchName="ngModel"
+                placeholder="Enter branch name"
+              />
+
+              @if (branchName.invalid && branchName.touched) {
+                <small class="field-error"> Branch name is required. </small>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Branch Address</h3>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label for="addressLine1">Address Line 1 *</label>
+              <input
+                id="addressLine1"
+                name="addressLine1"
+                type="text"
+                [(ngModel)]="branchForm.addressLine1"
+                maxlength="200"
+                required
+                placeholder="Street address"
+              />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="addressLine2">Address Line 2</label>
+              <input
+                id="addressLine2"
+                name="addressLine2"
+                type="text"
+                [(ngModel)]="branchForm.addressLine2"
+                maxlength="200"
+                placeholder="Building, complex or additional information"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="city">City *</label>
+              <input
+                id="city"
+                name="city"
+                type="text"
+                [(ngModel)]="branchForm.city"
+                maxlength="100"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="province">Province *</label>
+              <input
+                id="province"
+                name="province"
+                type="text"
+                [(ngModel)]="branchForm.province"
+                maxlength="100"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="postalCode">Postal Code</label>
+              <input
+                id="postalCode"
+                name="postalCode"
+                type="text"
+                [(ngModel)]="branchForm.postalCode"
+                maxlength="10"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="countryCode">Country Code *</label>
+              <input
+                id="countryCode"
+                name="countryCode"
+                type="text"
+                [(ngModel)]="branchForm.countryCode"
+                maxlength="2"
+                minlength="2"
+                required
+                pattern="[A-Za-z]{2}"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Contact Information</h3>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="phoneNumber">Phone Number</label>
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                [(ngModel)]="branchForm.phoneNumber"
+                maxlength="30"
+                placeholder="Branch contact number"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="email">Email Address</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                [(ngModel)]="branchForm.email"
+                maxlength="150"
+                email
+                #email="ngModel"
+                placeholder="branch@bank.co.za"
+              />
+
+              @if (email.invalid && email.touched) {
+                <small class="field-error"> Enter a valid email address. </small>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Regional Settings</h3>
+
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label for="timeZoneId">Time Zone *</label>
+              <input
+                id="timeZoneId"
+                name="timeZoneId"
+                type="text"
+                [(ngModel)]="branchForm.timeZoneId"
+                maxlength="100"
+                required
+                placeholder="South Africa Standard Time"
+              />
+              <small class="field-hint"> Windows time zone identifier used by the backend. </small>
+            </div>
+
+            <div class="form-field full-width">
+              <label class="checkbox-label">
+                <input type="checkbox" name="isActive" [(ngModel)]="branchForm.isActive" />
+                <span>Branch is active</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="secondary-button"
+            (click)="closeForm()"
+            [disabled]="isSaving()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            class="primary-button"
+            [disabled]="branchNgForm.invalid || isSaving()"
+          >
+            @if (isSaving()) {
+              <i class="pi pi-spin pi-spinner"></i>
+              Saving...
+            } @else {
+              <i class="pi pi-save"></i>
+              {{ editingBranchId() ? 'Update Branch' : 'Save Branch' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <div class="branches-toolbar">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+
+      <input
+        #searchInput
+        type="text"
+        placeholder="Search by branch name, code, city..."
+        [value]="searchTerm()"
+        (input)="onSearchChange(searchInput.value)"
+      />
+    </div>
+
+    <div class="branch-count">
+      {{ filteredBranches().length }}
+      {{ filteredBranches().length === 1 ? 'branch' : 'branches' }}
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="state-message">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading branches...</span>
+    </div>
+  }
+
+  @if (errorMessage() && !showForm()) {
+    <div class="error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ errorMessage() }}
+      <button type="button" (click)="loadBranches()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading() && !errorMessage()) {
+    @if (filteredBranches().length > 0) {
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Branch Code</th>
+              <th>Branch Name</th>
+              <th>Location</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (branch of filteredBranches(); track branch.branchId) {
+              <tr>
+                <td>
+                  <span class="branch-code">
+                    {{ branch.branchCode }}
+                  </span>
+                </td>
+
+                <td>
+                  <div class="branch-name">
+                    {{ branch.branchName }}
+                  </div>
+                  <div class="branch-address">
+                    {{ branch.addressLine1 }}
+                  </div>
+                </td>
+
+                <td>
+                  <div>{{ branch.city }}</div>
+                  <div class="secondary-text">
+                    {{ branch.province }}
+                  </div>
+                </td>
+
+                <td>
+                  <div>{{ branch.phoneNumber || '—' }}</div>
+                  <div class="secondary-text">
+                    {{ branch.email || '—' }}
+                  </div>
+                </td>
+
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="branch.isActive"
+                    [class.inactive]="!branch.isActive"
+                  >
+                    {{ branch.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+
+                <td>
+                  {{ branch.createdAt | date: 'dd MMM yyyy' }}
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="icon-button edit-button"
+                    title="Edit branch"
+                    aria-label="Edit branch"
+                    (click)="editBranch(branch)"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-button deactivate-button"
+                    title="Deactivate branch"
+                    (click)="deactivateBranch(branch)"
+                    [disabled]="!branch.isActive"
+                  >
+                    <i class="pi pi-ban"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <i class="pi pi-building"></i>
+        <h3>No branches found</h3>
+        <p>
+          @if (searchTerm()) {
+            Try adjusting your search criteria.
+          } @else {
+            There are currently no branches available.
+          }
+        </p>
+      </div>
+    }
+  }
+</section>

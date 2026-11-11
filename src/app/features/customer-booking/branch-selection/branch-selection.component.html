@@ -1,0 +1,95 @@
+<div class="booking-page">
+  <div class="booking-heading">
+    <span class="eyebrow">APPOINTMENT BOOKING</span>
+
+    <h1>Banking that works around you.</h1>
+
+    <p>
+      Book an appointment at a branch that suits you. Choose your branch and we'll help you find a
+      convenient time.
+    </p>
+  </div>
+
+  <div class="booking-card">
+    <div class="step-indicator">
+      <span class="step-number">1</span>
+      <span>Step 1 of 5</span>
+    </div>
+
+    <h2>Select your branch</h2>
+
+    <p class="card-description">Choose the branch where you would like to be assisted.</p>
+
+    @if (loading()) {
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Loading available branches...</span>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="error-state">
+        <i class="pi pi-exclamation-circle"></i>
+        <p>{{ errorMessage() }}</p>
+
+        <button type="button" (click)="loadBranches()">Try again</button>
+      </div>
+    }
+
+    @if (!loading() && !errorMessage()) {
+      @if (branches().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-map-marker"></i>
+          <h3>No branches available</h3>
+          <p>Please try again later.</p>
+        </div>
+      } @else {
+        <div class="branch-list">
+          @for (branch of branches(); track branch.branchId) {
+            <button
+              type="button"
+              class="branch-option"
+              [class.selected]="isSelected(branch)"
+              [attr.aria-pressed]="isSelected(branch)"
+              (click)="selectBranch(branch)"
+            >
+              <span class="branch-icon">
+                <i class="pi pi-building"></i>
+              </span>
+
+              <span class="branch-information">
+                <strong>{{ branch.branchName }} — {{ branch.branchCode }}</strong>
+
+                <span>{{ branch.addressLine1 }}</span>
+
+                @if (branch.addressLine2) {
+                  <span>{{ branch.addressLine2 }}</span>
+                }
+
+                <span>{{ branch.city }}, {{ branch.province }}</span>
+
+                <small>
+                  <i class="pi pi-phone"></i>
+                  {{ branch.phoneNumber }}
+                </small>
+              </span>
+
+              <span class="selection-indicator">
+                @if (isSelected(branch)) {
+                  <i class="pi pi-check-circle"></i>
+                } @else {
+                  <i class="pi pi-circle"></i>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      }
+    }
+
+    <div class="card-footer">
+      <span>Secure appointment booking</span>
+      <i class="pi pi-lock"></i>
+    </div>
+  </div>
+</div>

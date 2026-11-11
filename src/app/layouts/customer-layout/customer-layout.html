@@ -1,0 +1,29 @@
+<div class="customer-shell">
+  <header class="topbar">
+    <a routerLink="/booking" class="brand">
+      <span class="brand-icon">
+        <i class="pi pi-building-columns"></i>
+      </span>
+
+      <span>
+        <strong>Bank Appointment</strong>
+        <small>Banking made simpler</small>
+      </span>
+    </a>
+
+    <nav class="top-navigation">
+      <a routerLink="/booking/branches" routerLinkActive="active"> Book an appointment </a>
+
+      <a routerLink="/admin"> Staff portal </a>
+    </nav>
+  </header>
+
+  <main class="customer-content">
+    <router-outlet />
+  </main>
+
+  <footer class="footer">
+    <span>© 2026 Bank Appointment Booking</span>
+    <span>Secure · Convenient · Simple</span>
+  </footer>
+</div>

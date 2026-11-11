@@ -1,0 +1,253 @@
+<section class="services-page">
+  <div class="page-header">
+    <div>
+      <h1>Services Management</h1>
+      <p>Manage the services offered across your branches.</p>
+    </div>
+
+    <button type="button" class="refresh-button" (click)="loadServices()" [disabled]="isLoading()">
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+    <button type="button" class="primary-button" (click)="openCreateForm()">
+      <i class="pi pi-plus"></i>
+      Add Service
+    </button>
+  </div>
+  @if (showForm()) {
+    <div class="form-card">
+      <div class="card-heading">
+        <div>
+          <h2>{{ editingServiceId() === null ? 'Create Service' : 'Edit Service' }}</h2>
+          <p>Enter the service details below.</p>
+        </div>
+
+        <button type="button" class="close-button" (click)="closeForm()" [disabled]="isSaving()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveService()">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="serviceCode">Service Code *</label>
+            <input
+              id="serviceCode"
+              type="text"
+              maxlength="30"
+              required
+              [ngModel]="form().serviceCode"
+              (ngModelChange)="updateServiceCode($event)"
+              name="serviceCode"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="serviceName">Service Name *</label>
+            <input
+              id="serviceName"
+              type="text"
+              maxlength="150"
+              required
+              [ngModel]="form().serviceName"
+              (ngModelChange)="updateServiceName($event)"
+              name="serviceName"
+            />
+          </div>
+
+          <div class="form-field full-width">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              rows="3"
+              maxlength="500"
+              [ngModel]="form().description"
+              (ngModelChange)="updateDescription($event)"
+              name="description"
+            ></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="durationMinutes">Duration (minutes) *</label>
+            <input
+              id="durationMinutes"
+              type="number"
+              min="5"
+              max="480"
+              required
+              [ngModel]="form().durationMinutes"
+              (ngModelChange)="updateDuration($event)"
+              name="durationMinutes"
+            />
+          </div>
+
+          <div class="form-field checkbox-field">
+            <label>
+              <input
+                type="checkbox"
+                [ngModel]="form().isActive"
+                (ngModelChange)="updateIsActive($event)"
+                name="isActive"
+              />
+              Active service
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-button" (click)="closeForm()" [disabled]="isSaving()">
+            Cancel
+          </button>
+
+          <button type="submit" class="primary-button" [disabled]="isSaving()">
+            <i class="pi pi-save"></i>
+            {{ isSaving() ? 'Saving...' : 'Save Service' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+  @if (successMessage()) {
+    <div class="message success-message">
+      <i class="pi pi-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="message error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="summary-card">
+    <div class="summary-icon">
+      <i class="pi pi-list"></i>
+    </div>
+    <div>
+      <span>Active Services</span>
+      <strong>{{ activeCount() }}</strong>
+    </div>
+  </div>
+
+  <div class="services-card">
+    <div class="card-heading">
+      <div>
+        <h2>All Services</h2>
+        <p>View and manage your master service catalogue.</p>
+      </div>
+      <span class="service-count">
+        {{ filteredServices().length }}
+        {{ filteredServices().length === 1 ? 'Service' : 'Services' }}
+      </span>
+    </div>
+
+    <div class="filter-row">
+      <div class="search-field">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          placeholder="Search by service code or name..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+
+      <label class="inactive-filter">
+        <input
+          type="checkbox"
+          [ngModel]="showInactive()"
+          (ngModelChange)="showInactive.set($event)"
+        />
+        Show inactive services
+      </label>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        Loading services...
+      </div>
+    } @else if (filteredServices().length === 0) {
+      <div class="empty-state">
+        <i class="pi pi-inbox"></i>
+        <h3>No services found</h3>
+        <p>There are no services matching your search.</p>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Service Code</th>
+              <th>Service Name</th>
+              <th>Description</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (service of filteredServices(); track service.serviceId) {
+              <tr>
+                <td>
+                  <span class="service-code">
+                    {{ service.serviceCode }}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="service-name">
+                    {{ service.serviceName }}
+                  </span>
+                </td>
+
+                <td>{{ service.description || '—' }}</td>
+
+                <td>{{ service.durationMinutes }} minutes</td>
+
+                <td>
+                  <span
+                    class="status-badge"
+                    [class.active]="service.isActive"
+                    [class.inactive]="!service.isActive"
+                  >
+                    {{ service.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+
+                <td>
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="action-button"
+                      [disabled]="isSaving()"
+                      (click)="openEditForm(service)"
+                    >
+                      <i class="pi pi-pencil"></i>
+                      Edit
+                    </button>
+
+                    @if (service.isActive) {
+                      <button
+                        type="button"
+                        class="deactivate-button"
+                        [disabled]="isSaving()"
+                        (click)="deactivateService(service)"
+                      >
+                        <i class="pi pi-ban"></i>
+                        Deactivate
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

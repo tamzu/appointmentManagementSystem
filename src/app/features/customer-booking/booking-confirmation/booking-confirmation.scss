@@ -1,0 +1,273 @@
+.confirmation-page {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 35px 20px 60px;
+}
+
+.page-heading {
+  margin-bottom: 30px;
+
+  .step-label {
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  h1 {
+    margin: 10px 0;
+    font-size: 30px;
+    color: #1e293b;
+  }
+
+  p {
+    color: #64748b;
+  }
+}
+
+.summary-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 18px;
+
+  h2 {
+    font-size: 17px;
+    margin: 0 0 20px;
+    color: #1e293b;
+  }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    resize: vertical;
+    font: inherit;
+  }
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  span {
+    color: #64748b;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #1e293b;
+    font-size: 14px;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.confirm-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 7px;
+  padding: 14px 22px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirm-button {
+  background: #1d4ed8;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #1e40af;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.secondary-button {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+
+  &:hover {
+    background: #e2e8f0;
+  }
+}
+
+.error-state {
+  padding: 13px;
+  margin-bottom: 18px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 7px;
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0 0 5px;
+    color: #047857;
+  }
+
+  p {
+    margin: 0;
+    color: #065f46;
+  }
+}
+
+.success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.reference-card {
+  border: 2px dashed #93c5fd;
+  background: #eff6ff;
+
+  p {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+}
+
+.reference-number {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1d4ed8;
+  overflow-wrap: anywhere;
+}
+
+.status-pending {
+  display: inline-block;
+  color: #92400e !important;
+  background: #fef3c7;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+@media (max-width: 600px) {
+  .summary-row {
+    flex-direction: column;
+    gap: 5px;
+
+    strong {
+      text-align: left;
+    }
+  }
+
+  .summary-card {
+    padding: 18px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 7px;
+  background: #047857;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #065f46;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .confirmation-page {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .summary-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #cbd5e1;
+    margin-bottom: 12px;
+    padding: 16px;
+  }
+
+  .success-banner {
+    background: white;
+    border: 1px solid #a7f3d0;
+  }
+
+  .reference-card {
+    background: white;
+  }
+}

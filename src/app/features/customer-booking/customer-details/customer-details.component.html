@@ -1,0 +1,137 @@
+<div class="customer-details-page">
+  <div class="page-heading">
+    <span class="step-label">STEP 4 OF 6</span>
+    <h1>Your Details</h1>
+    <p>Please provide your personal information to continue with your appointment booking.</p>
+  </div>
+
+  <form [formGroup]="customerForm" (ngSubmit)="submit()">
+    <section class="form-section">
+      <h2>Personal Information</h2>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="firstName">First Name *</label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="Enter your first name"
+          />
+
+          @if (firstName.touched && firstName.invalid) {
+            <small class="error-message">Please enter your first name.</small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="lastName">Last Name *</label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            placeholder="Enter your last name"
+          />
+
+          @if (lastName.touched && lastName.invalid) {
+            <small class="error-message">Please enter your last name.</small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email Address *</label>
+          <input id="email" type="email" formControlName="email" placeholder="example@email.com" />
+
+          @if (email.touched && email.invalid) {
+            <small class="error-message">Enter a valid email address.</small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="phoneNumber">Mobile Number *</label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="+27 82 123 4567"
+          />
+
+          @if (phoneNumber.touched && phoneNumber.invalid) {
+            <small class="error-message">Enter a valid mobile number.</small>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Identity Information</h2>
+
+      <div class="form-field">
+        <label for="documentType">Identity Document Type *</label>
+
+        <select id="documentType" formControlName="documentType" (change)="onDocumentTypeChange()">
+          @for (type of documentTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label for="documentNumber">
+          {{
+            customerForm.controls.documentType.value === 'RSA_ID'
+              ? 'South African ID Number *'
+              : 'Passport Number *'
+          }}
+        </label>
+
+        <input
+          id="documentNumber"
+          type="text"
+          formControlName="documentNumber"
+          [placeholder]="
+            customerForm.controls.documentType.value === 'RSA_ID'
+              ? 'Enter your 13-digit ID number'
+              : 'Enter your passport number'
+          "
+          autocomplete="off"
+        />
+
+        @if (documentNumber.touched && documentNumber.invalid) {
+          <small class="error-message">Please enter your document number.</small>
+        }
+      </div>
+
+      <p class="security-note">
+        <span>🔒</span>
+        Your identity information is protected and securely processed.
+      </p>
+    </section>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="continue-button"
+        [disabled]="saving() || createdCustomer() !== null"
+      >
+        @if (saving()) {
+          Registering...
+        } @else {
+          Register Customer
+          <span>→</span>
+        }
+      </button>
+    </div>
+    @if (errorMessage()) {
+      <div class="error-state">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="success-state">
+        {{ successMessage() }}
+      </div>
+    }
+  </form>
+</div>

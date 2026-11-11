@@ -1,0 +1,69 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <i class="pi pi-building-columns"></i>
+      <h1>Appointment Admin</h1>
+      <p>Bank Appointment Management System</p>
+    </div>
+
+    <div class="login-heading">
+      <h2>Welcome back</h2>
+      <p>Sign in using your staff account.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-field">
+        <label for="email">Email address</label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Enter your email address"
+          autocomplete="username"
+          required
+          email
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+          [disabled]="loading()"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-message" role="alert">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <button type="submit" [disabled]="loading() || loginForm.invalid">
+        @if (loading()) {
+          <i class="pi pi-spin pi-spinner"></i>
+          Signing in...
+        } @else {
+          Sign in
+          <i class="pi pi-arrow-right"></i>
+        }
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <i class="pi pi-shield"></i>
+      Secure staff access
+    </div>
+  </div>
+</div>

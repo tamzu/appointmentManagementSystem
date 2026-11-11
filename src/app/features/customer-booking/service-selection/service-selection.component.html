@@ -1,0 +1,92 @@
+<section class="service-selection">
+  <div class="page-heading">
+    <div>
+      <span class="step-label">STEP 2 OF 4</span>
+      <h1>Select a Service</h1>
+      <p>Choose the service you would like assistance with.</p>
+    </div>
+  </div>
+
+  @if (branch(); as selectedBranch) {
+    <div class="branch-summary">
+      <div class="branch-summary-icon">
+        <i class="pi pi-building"></i>
+      </div>
+
+      <div class="branch-summary-details">
+        <span>Selected branch</span>
+        <strong>{{ selectedBranch.branchName }}</strong>
+        <small>{{ selectedBranch.city }}, {{ selectedBranch.province }}</small>
+      </div>
+
+      <button type="button" class="change-branch" (click)="changeBranch()">Change branch</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Loading available services...</p>
+    </div>
+  }
+
+  @if (errorMessage(); as error) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-circle"></i>
+      <p>{{ error }}</p>
+
+      <button type="button" (click)="loadServices(branch()!.branchId)">Try again</button>
+    </div>
+  }
+
+  @if (!loading() && !errorMessage() && services().length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-info-circle"></i>
+      <h3>No services available</h3>
+      <p>This branch currently has no available appointment services.</p>
+    </div>
+  }
+
+  @if (!loading() && services().length > 0) {
+    <div class="service-list">
+      @for (service of services(); track service.branchServiceId) {
+        <button
+          type="button"
+          class="service-option"
+          [class.selected]="isSelected(service)"
+          (click)="selectService(service)"
+        >
+          <div class="service-icon">
+            <i class="pi pi-briefcase"></i>
+          </div>
+
+          <div class="service-information">
+            <h3>{{ service.serviceName }}</h3>
+            <p>{{ service.serviceCode }}</p>
+            <span>
+              <i class="pi pi-clock"></i>
+              {{ service.durationMinutes }} minutes
+            </span>
+          </div>
+
+          <div class="selection-indicator">
+            @if (isSelected(service)) {
+              <i class="pi pi-check-circle"></i>
+            } @else {
+              <i class="pi pi-circle"></i>
+            }
+          </div>
+        </button>
+      }
+    </div>
+  }
+
+  @if (selectedServiceId() !== null) {
+    <div class="continue-section">
+      <button type="button" class="continue-button" (click)="continueToSlots()">
+        Choose Date & Time
+        <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+  }
+</section>

@@ -1,0 +1,58 @@
+<header class="admin-topbar">
+  <span>Bank Appointment Management</span>
+
+  <div class="admin-user">
+    <i class="pi pi-user-circle"></i>
+
+    <span>{{ currentStaff()?.fullName }}</span>
+
+    <button type="button" class="logout-button" (click)="logout()" title="Sign out">
+      <i class="pi pi-sign-out"></i>
+      Logout
+    </button>
+  </div>
+</header>
+
+<nav class="admin-navigation">
+  <a routerLink="/booking/branches" class="booking-button">
+    <i class="pi pi-calendar-plus"></i>
+    <span>Book an Appointment</span>
+  </a>
+  <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+    <i class="pi pi-home"></i>
+    Dashboard
+  </a>
+
+  <a routerLink="/admin/appointments" routerLinkActive="active">
+    <i class="pi pi-calendar"></i>
+    Appointments
+  </a>
+  <a routerLink="/admin/branches" routerLinkActive="active">
+    <i class="pi pi-building"></i>
+    <span>Branches</span>
+  </a>
+  <a routerLink="/admin/branch-services" routerLinkActive="active">
+    <i class="pi pi-list"></i>
+    <span>Branch Services</span>
+  </a>
+  <a routerLink="/admin/services" routerLinkActive="active">
+    <i class="pi pi-briefcase"></i>
+    <span>Services</span>
+  </a>
+  <a routerLink="/admin/operating-hours" routerLinkActive="active">
+    <i class="pi pi-clock"></i>
+    <span>Operating Hours</span>
+  </a>
+  <a routerLink="/admin/branch-closures" routerLinkActive="active">
+    <i class="pi pi-calendar-times"></i>
+    <span>Branch Closures</span>
+  </a>
+  <a routerLink="/admin/slots" routerLinkActive="active">
+    <i class="pi pi-calendar-plus"></i>
+    <span>Appointment Slots</span>
+  </a>
+</nav>
+
+<main class="admin-content">
+  <router-outlet />
+</main>

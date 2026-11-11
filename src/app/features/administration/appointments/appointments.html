@@ -1,0 +1,168 @@
+<section class="appointments-page">
+  <div class="page-header">
+    <div>
+      <h1>Appointments Management</h1>
+      <p>View, search and manage customer appointments.</p>
+    </div>
+
+    <button type="button" class="refresh-button" (click)="loadAppointments()">
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filter-panel">
+    <div class="search-field">
+      <label for="search">Search appointments</label>
+      <div class="search-input">
+        <i class="pi pi-search"></i>
+        <input
+          id="search"
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Customer name, phone, email or reference"
+          (keyup.enter)="searchAppointments()"
+        />
+      </div>
+    </div>
+
+    <div class="filter-field">
+      <label for="status">Appointment status</label>
+      <select id="status" [(ngModel)]="selectedStatus">
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-field">
+      <label for="dateFrom">Date from</label>
+      <input id="dateFrom" type="date" [(ngModel)]="dateFrom" />
+    </div>
+
+    <div class="filter-field">
+      <label for="dateTo">Date to</label>
+      <input id="dateTo" type="date" [(ngModel)]="dateTo" />
+    </div>
+
+    <div class="filter-actions">
+      <button type="button" class="apply-button" (click)="applyFilters()">
+        <i class="pi pi-filter"></i>
+        Apply
+      </button>
+
+      <button type="button" class="clear-button" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary">
+    <span>
+      Total appointments:
+      <strong>{{ totalRecords() }}</strong>
+    </span>
+
+    <span> Page {{ currentPage }} of {{ totalPages() || 1 }} </span>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      Loading appointments...
+    </div>
+  }
+
+  <!-- Error -->
+  @if (errorMessage()) {
+    <div class="error-state">
+      {{ errorMessage() }}
+      <button type="button" (click)="loadAppointments()">Retry</button>
+    </div>
+  }
+
+  <!-- Appointment Table -->
+  @if (!isLoading() && !errorMessage()) {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Branch</th>
+            <th>Service</th>
+            <th>Appointment Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (appointment of appointments(); track appointment.appointmentId) {
+            <tr>
+              <td class="reference-cell">
+                {{ appointment.appointmentReference }}
+              </td>
+
+              <td>
+                <strong>{{ appointment.customerName }}</strong>
+              </td>
+
+              <td>
+                <div>{{ appointment.customerPhone }}</div>
+                <small>{{ appointment.customerEmail || 'No email' }}</small>
+              </td>
+
+              <td>{{ appointment.branchName }}</td>
+
+              <td>{{ appointment.serviceName }}</td>
+
+              <td>
+                {{ appointment.appointmentDateTime | date: 'dd MMM yyyy, HH:mm' }}
+              </td>
+
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(appointment.statusCode)">
+                  {{ appointment.statusName }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <a
+                  class="view-details-button"
+                  [routerLink]="['/admin/appointments', appointment.appointmentId]"
+                  title="View appointment details"
+                >
+                  <i class="pi pi-eye"></i>
+                  View
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">No appointments found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button type="button" [disabled]="currentPage <= 1" (click)="goToPage(currentPage - 1)">
+        Previous
+      </button>
+
+      <span> Page {{ currentPage }} of {{ totalPages() || 1 }} </span>
+
+      <button
+        type="button"
+        [disabled]="currentPage >= totalPages()"
+        (click)="goToPage(currentPage + 1)"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>

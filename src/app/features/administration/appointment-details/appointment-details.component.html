@@ -1,0 +1,248 @@
+<section class="appointment-details-page">
+  <div class="page-header">
+    <div>
+      <button type="button" class="back-button" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+        Back to Appointments
+      </button>
+
+      <h1>Appointment Details</h1>
+      <p>View the complete appointment and customer information.</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <span>Loading appointment details...</span>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ errorMessage() }}</span>
+      <button type="button" (click)="goBack()">Return to Appointments</button>
+    </div>
+  } @else if (appointment(); as item) {
+    <div class="details-card">
+      <div class="card-header">
+        <div>
+          <span class="section-label">Appointment Reference</span>
+          <h2>{{ item.appointmentReference }}</h2>
+        </div>
+
+        <span class="status-badge" [class]="getStatusClass(item.statusCode)">
+          {{ item.statusName }}
+        </span>
+        @if (appointment()?.statusCode === 'PENDING') {
+          <button
+            type="button"
+            class="confirm-button"
+            (click)="confirmAppointment()"
+            [disabled]="isConfirming()"
+          >
+            <i class="pi pi-check-circle"></i>
+            {{ isConfirming() ? 'Confirming...' : 'Confirm Appointment' }}
+          </button>
+        }
+        @if (appointment() && ['PENDING', 'CONFIRMED'].includes(appointment()!.statusCode)) {
+          <button type="button" class="cancel-button" (click)="showCancellationForm.set(true)">
+            <i class="pi pi-times-circle"></i>
+            Cancel Appointment
+          </button>
+        }
+      </div>
+      @if (confirmationMessage()) {
+        <div class="success-message">
+          <i class="pi pi-check-circle"></i>
+          {{ confirmationMessage() }}
+        </div>
+      }
+
+      @if (confirmationError()) {
+        <div class="error-message">
+          <i class="pi pi-exclamation-circle"></i>
+          {{ confirmationError() }}
+        </div>
+      }
+      @if (cancellationMessage()) {
+        <div class="success-message">
+          {{ cancellationMessage() }}
+        </div>
+      }
+
+      @if (cancellationError()) {
+        <div class="error-message">
+          {{ cancellationError() }}
+        </div>
+      }
+
+      @if (showCancellationForm()) {
+        <div class="cancellation-form">
+          <h3>Cancel Appointment</h3>
+
+          <p>Please provide a reason for cancelling this appointment.</p>
+
+          <textarea
+            rows="4"
+            maxlength="500"
+            placeholder="Enter cancellation reason..."
+            [value]="cancellationReason()"
+            (input)="cancellationReason.set($any($event.target).value)"
+          ></textarea>
+
+          <div class="cancellation-actions">
+            <button
+              type="button"
+              class="cancel-confirm-button"
+              (click)="cancelAppointment()"
+              [disabled]="isCancelling() || !cancellationReason().trim()"
+            >
+              @if (isCancelling()) {
+                <i class="pi pi-spin pi-spinner"></i>
+                Cancelling...
+              } @else {
+                Confirm Cancellation
+              }
+            </button>
+
+            <button
+              type="button"
+              class="cancel-dismiss-button"
+              (click)="showCancellationForm.set(false)"
+              [disabled]="isCancelling()"
+            >
+              Keep Appointment
+            </button>
+          </div>
+        </div>
+      }
+      <div class="details-grid">
+        <div class="detail-section">
+          <h3><i class="pi pi-user"></i> Customer Information</h3>
+
+          <div class="detail-item">
+            <span>Customer Name</span>
+            <strong>{{ item.customerName }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Email Address</span>
+            <strong>{{ item.customerEmail || 'Not provided' }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Phone Number</span>
+            <strong>{{ item.customerPhone }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Customer ID</span>
+            <strong>{{ item.customerId }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3><i class="pi pi-building"></i> Branch Information</h3>
+
+          <div class="detail-item">
+            <span>Branch</span>
+            <strong>{{ item.branchName }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Branch Code</span>
+            <strong>{{ item.branchCode }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Address</span>
+            <strong>{{ item.branchAddress }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>City / Province</span>
+            <strong>{{ item.branchCity }}, {{ item.branchProvince }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3><i class="pi pi-briefcase"></i> Service Information</h3>
+
+          <div class="detail-item">
+            <span>Service</span>
+            <strong>{{ item.serviceName }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Description</span>
+            <strong>{{ item.serviceDescription || 'No description' }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Duration</span>
+            <strong>{{ item.serviceDurationMinutes }} minutes</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Slot ID</span>
+            <strong>{{ item.slotId }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3><i class="pi pi-calendar"></i> Appointment Information</h3>
+
+          <div class="detail-item">
+            <span>Appointment Date</span>
+            <strong>{{ item.appointmentDateTime | date: 'EEEE, dd MMMM yyyy' }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Start Time</span>
+            <strong>{{ item.appointmentDateTime | date: 'HH:mm' }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>End Time</span>
+            <strong>{{ item.appointmentEndDateTime | date: 'HH:mm' }}</strong>
+          </div>
+
+          <div class="detail-item">
+            <span>Booking Date</span>
+            <strong>{{ item.bookingDate | date: 'dd MMM yyyy, HH:mm' }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section notes-section">
+        <h3><i class="pi pi-comment"></i> Additional Information</h3>
+
+        <div class="detail-item">
+          <span>Customer Notes</span>
+          <strong>{{ item.customerNotes || 'No customer notes' }}</strong>
+        </div>
+
+        @if (item.cancellationReason) {
+          <div class="detail-item">
+            <span>Cancellation Reason</span>
+            <strong>{{ item.cancellationReason }}</strong>
+          </div>
+        }
+        @if (item.cancelledAt) {
+          <div class="detail-item">
+            <span>Cancelled At</span>
+            <strong>{{ item.cancelledAt | date: 'dd MMM yyyy, HH:mm' }}</strong>
+          </div>
+        }
+      </div>
+
+      <div class="audit-information">
+        <span>Created: {{ item.createdAt | date: 'dd MMM yyyy, HH:mm' }}</span>
+        <span>
+          Last Updated:
+          {{ item.updatedAt ? (item.updatedAt | date: 'dd MMM yyyy, HH:mm') : 'Never' }}
+        </span>
+      </div>
+    </div>
+  }
+</section>

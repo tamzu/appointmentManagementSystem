@@ -1,0 +1,205 @@
+<div class="confirmation-page">
+  <div class="page-heading no-print">
+    <span class="step-label">STEP 5 OF 6</span>
+    <h1>Review Your Appointment</h1>
+    <p>Please check your details before confirming your appointment.</p>
+  </div>
+
+  <div class="receipt-content">
+    @if (appointment(); as booking) {
+      <div class="success-banner">
+        <div class="success-icon">✓</div>
+        <div>
+          <h2>Appointment successfully created!</h2>
+          <p>Your appointment has been booked and is currently {{ booking.statusName }}.</p>
+        </div>
+      </div>
+
+      <section class="summary-card reference-card">
+        <h2>Appointment Reference</h2>
+        <div class="reference-number">{{ booking.appointmentReference }}</div>
+        <p>Please keep this reference number for future enquiries.</p>
+      </section>
+    }
+
+    <section class="summary-card">
+      <h2>Branch Information</h2>
+
+      @if (branch(); as selectedBranch) {
+        <div class="summary-row">
+          <span>Branch</span>
+          <strong>{{ selectedBranch.branchName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Branch Code</span>
+          <strong>{{ selectedBranch.branchCode }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Address</span>
+          <strong>
+            {{ selectedBranch.addressLine1 }}
+            @if (selectedBranch.addressLine2) {
+              , {{ selectedBranch.addressLine2 }}
+            }
+            , {{ selectedBranch.city }}, {{ selectedBranch.province }}
+            {{ selectedBranch.postalCode }}
+          </strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Contact Number</span>
+          <strong>{{ selectedBranch.phoneNumber }}</strong>
+        </div>
+      }
+    </section>
+
+    <section class="summary-card">
+      <h2>Service Information</h2>
+
+      @if (service(); as selectedService) {
+        <div class="summary-row">
+          <span>Service</span>
+          <strong>{{ selectedService.serviceName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Duration</span>
+          <strong>{{ selectedService.durationMinutes }} minutes</strong>
+        </div>
+      }
+    </section>
+
+    <section class="summary-card">
+      <h2>Appointment Date and Time</h2>
+
+      @if (slot(); as selectedSlot) {
+        <div class="summary-row">
+          <span>Date</span>
+          <strong>{{ formatDate(selectedSlot.startDateTime) }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Start Time</span>
+          <strong>{{ formatTime(selectedSlot.startDateTime) }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>End Time</span>
+          <strong>{{ formatTime(selectedSlot.endDateTime) }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Time Zone</span>
+          <strong>South African Standard Time (SAST)</strong>
+        </div>
+      }
+    </section>
+
+    <section class="summary-card">
+      <h2>Customer Information</h2>
+
+      @if (customer(); as registeredCustomer) {
+        <div class="summary-row">
+          <span>Full Name</span>
+          <strong>{{ registeredCustomer.firstName }} {{ registeredCustomer.lastName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Email</span>
+          <strong>{{ registeredCustomer.email }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Phone</span>
+          <strong>{{ registeredCustomer.phoneNumber }}</strong>
+        </div>
+      }
+
+      @if (identityDocument(); as document) {
+        <div class="summary-row">
+          <span>Document Type</span>
+          <strong>{{ document.documentTypeName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Document Number</span>
+          <strong>{{ document.maskedDocumentNumber }}</strong>
+        </div>
+      }
+    </section>
+
+    @if (appointment(); as booking) {
+      <section class="summary-card">
+        <h2>Booking Status</h2>
+
+        <div class="summary-row">
+          <span>Status</span>
+          <strong class="status-pending">{{ booking.statusName }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Booking Reference</span>
+          <strong>{{ booking.appointmentReference }}</strong>
+        </div>
+      </section>
+      @if (pdfErrorMessage()) {
+        <div class="error-state">{{ pdfErrorMessage() }}</div>
+      }
+      <div class="form-actions no-print">
+        <button
+          type="button"
+          class="download-button"
+          [disabled]="pdfGenerating()"
+          (click)="downloadConfirmationPdf()"
+        >
+          <i class="pi pi-file-pdf"></i>
+          {{ pdfGenerating() ? 'Generating PDF...' : 'Download PDF' }}
+        </button>
+        <button type="button" class="secondary-button" (click)="printConfirmation()">
+          <i class="pi pi-print"></i>
+          Print Confirmation
+        </button>
+
+        <button type="button" class="confirm-button" (click)="bookAnotherAppointment()">
+          Book Another Appointment
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      </div>
+    } @else {
+      <section class="summary-card no-print">
+        <h2>Additional Notes</h2>
+
+        <textarea
+          [ngModel]="customerNotes()"
+          (ngModelChange)="customerNotes.set($event)"
+          placeholder="Enter any additional information (optional)"
+          rows="4"
+        ></textarea>
+      </section>
+
+      @if (errorMessage()) {
+        <div class="error-state no-print">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="form-actions no-print">
+        <button
+          type="button"
+          class="confirm-button"
+          [disabled]="saving()"
+          (click)="confirmAppointment()"
+        >
+          @if (saving()) {
+            Confirming...
+          } @else {
+            Confirm Appointment
+            <i class="pi pi-arrow-right"></i>
+          }
+        </button>
+      </div>
+    }
+  </div>
+</div>

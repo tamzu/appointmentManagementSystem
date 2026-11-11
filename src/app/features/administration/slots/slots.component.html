@@ -1,0 +1,168 @@
+<div class="slots-page">
+  <div class="page-header">
+    <div>
+      <h2>Appointment Slot Generation</h2>
+      <p>Generate appointment slots for a selected branch and service.</p>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-notification">
+      <div class="error-icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+
+      <div class="error-content">
+        <strong>Something went wrong</strong>
+        <p>{{ errorMessage() }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="notification-close"
+        (click)="errorMessage.set('')"
+        aria-label="Dismiss notification"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="success-notification">
+      <div class="success-icon">
+        <i class="pi pi-check"></i>
+      </div>
+
+      <div class="success-content">
+        <strong>Appointment slots generated!</strong>
+        <p>{{ successMessage() }}</p>
+      </div>
+
+      <button
+        type="button"
+        class="notification-close"
+        (click)="dismissSuccessNotification()"
+        aria-label="Dismiss notification"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  }
+
+  <section class="form-card">
+    <h3>Generation Details</h3>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="branch">Branch <span>*</span></label>
+        <select
+          id="branch"
+          [ngModel]="selectedBranchId()"
+          (ngModelChange)="onBranchChange($event ? +$event : null)"
+        >
+          <option [ngValue]="null">Select branch</option>
+          @for (branch of branches(); track branch.branchId) {
+            <option [ngValue]="branch.branchId">
+              {{ branch.branchCode }} - {{ branch.branchName }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="service">Service <span>*</span></label>
+        <select
+          id="service"
+          [ngModel]="selectedServiceId()"
+          (ngModelChange)="selectedServiceId.set($event ? +$event : null)"
+          [disabled]="!selectedBranchId()"
+        >
+          <option [ngValue]="null">Select service</option>
+          @for (service of services(); track service.serviceId) {
+            <option [ngValue]="service.serviceId">
+              {{ service.serviceName }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="startDate">Start Date <span>*</span></label>
+        <input
+          id="startDate"
+          type="date"
+          [ngModel]="startDate()"
+          (ngModelChange)="startDate.set($event)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="endDate">End Date <span>*</span></label>
+        <input
+          id="endDate"
+          type="date"
+          [ngModel]="endDate()"
+          (ngModelChange)="endDate.set($event)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="capacity">Capacity per slot <span>*</span></label>
+        <input
+          id="capacity"
+          type="number"
+          min="1"
+          max="100"
+          [ngModel]="capacity()"
+          (ngModelChange)="capacity.set(+$event)"
+        />
+        <small>Number of customers allowed per appointment slot.</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-primary" (click)="generateSlots()" [disabled]="loading()">
+        @if (loading()) {
+          Generating...
+        } @else {
+          Generate Appointment Slots
+        }
+      </button>
+    </div>
+  </section>
+  @if (generationResult(); as result) {
+    <section class="result-card">
+      <h3>Generation Summary</h3>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <span>Generated Slots</span>
+          <strong>{{ result.generatedCount }}</strong>
+        </div>
+
+        <div class="result-item">
+          <span>Skipped Closed Days</span>
+          <strong>{{ result.skippedClosedDays }}</strong>
+        </div>
+
+        <div class="result-item">
+          <span>Skipped Past Slots</span>
+          <strong>{{ result.skippedPastSlots }}</strong>
+        </div>
+
+        <div class="result-item">
+          <span>Skipped Existing Slots</span>
+          <strong>{{ result.skippedExistingSlots }}</strong>
+        </div>
+      </div>
+
+      <div class="result-details">
+        <p><strong>Branch ID:</strong> {{ result.branchId }}</p>
+        <p><strong>Service ID:</strong> {{ result.serviceId }}</p>
+        <p><strong>Start Date:</strong> {{ result.startDate }}</p>
+        <p><strong>End Date:</strong> {{ result.endDate }}</p>
+      </div>
+    </section>
+  }
+</div>

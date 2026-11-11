@@ -1,0 +1,200 @@
+<section class="branch-closures-page">
+  <div class="page-header">
+    <div>
+      <h1>Branch Closures</h1>
+      <p>Manage public holidays and temporary branch closures.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="loadBranches()"
+      [disabled]="isLoadingBranches()"
+    >
+      <i class="pi pi-refresh"></i>
+      Refresh
+    </button>
+  </div>
+
+  @if (successMessage()) {
+    <div class="message success-message">
+      <i class="pi pi-check-circle"></i>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="message error-message">
+      <i class="pi pi-exclamation-circle"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="branch-selector-card">
+    <label for="branchSelect">Select Branch</label>
+
+    <select
+      id="branchSelect"
+      [ngModel]="selectedBranchId()"
+      (ngModelChange)="selectBranch($event ? +$event : null)"
+      [disabled]="isLoadingBranches()"
+    >
+      <option [ngValue]="null">Select a branch</option>
+
+      @for (branch of activeBranches(); track branch.branchId) {
+        <option [ngValue]="branch.branchId">
+          {{ branch.branchCode }} - {{ branch.branchName }}
+        </option>
+      }
+    </select>
+  </div>
+
+  @if (isLoadingBranches()) {
+    <div class="loading-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      Loading branches...
+    </div>
+  } @else if (selectedBranchId() === null) {
+    <div class="empty-state">
+      <i class="pi pi-building"></i>
+      <h3>Select a branch</h3>
+      <p>Select a branch to manage its closure dates.</p>
+    </div>
+  } @else {
+    <div class="closures-card">
+      <div class="card-heading">
+        <div>
+          <h2>Closure Schedule</h2>
+          <p>{{ selectedBranchName() }}</p>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button type="button" class="add-button" (click)="openCreateForm()" [disabled]="showForm()">
+          <i class="pi pi-plus"></i>
+          Add Closure
+        </button>
+      </div>
+
+      @if (showForm()) {
+        <div class="closure-form">
+          <h3>
+            {{ editingClosureId() === null ? 'Add Branch Closure' : 'Edit Branch Closure' }}
+          </h3>
+
+          <div class="form-fields">
+            <div class="form-field">
+              <label for="startDate">Start Date</label>
+              <input
+                id="startDate"
+                type="date"
+                [ngModel]="startDate()"
+                (ngModelChange)="startDate.set($event)"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="endDate">End Date</label>
+              <input
+                id="endDate"
+                type="date"
+                [ngModel]="endDate()"
+                (ngModelChange)="endDate.set($event)"
+              />
+            </div>
+
+            <div class="form-field full-width">
+              <label for="reason">Closure Reason</label>
+              <textarea
+                id="reason"
+                rows="3"
+                maxlength="250"
+                placeholder="e.g. Public Holiday, Christmas Closure"
+                [ngModel]="reason()"
+                (ngModelChange)="reason.set($event)"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="closeForm()"
+              [disabled]="isSaving()"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="save-button"
+              (click)="saveClosure()"
+              [disabled]="isSaving()"
+            >
+              {{ isSaving() ? 'Saving...' : 'Save Closure' }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (isLoadingClosures()) {
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          Loading branch closures...
+        </div>
+      } @else if (closures().length === 0) {
+        <div class="empty-state">
+          <i class="pi pi-calendar"></i>
+          <h3>No closures configured</h3>
+          <p>This branch currently has no scheduled closures.</p>
+        </div>
+      } @else {
+        <div class="closures-list">
+          @for (closure of closures(); track closure.branchClosureId) {
+            <div class="closure-row">
+              <div class="closure-date">
+                <i class="pi pi-calendar"></i>
+                <div>
+                  <strong>
+                    {{ closure.startDate | date: 'dd MMM yyyy' }}
+                  </strong>
+
+                  @if (closure.startDate !== closure.endDate) {
+                    <span> to {{ closure.endDate | date: 'dd MMM yyyy' }} </span>
+                  }
+                </div>
+              </div>
+
+              <div class="closure-reason">
+                {{ closure.reason || 'No reason provided' }}
+              </div>
+
+              <span class="closure-badge">Scheduled</span>
+              <div class="closure-actions">
+                <button
+                  type="button"
+                  class="edit-button"
+                  (click)="openEditForm(closure)"
+                  [disabled]="showForm()"
+                  title="Edit closure"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  (click)="deleteClosure(closure)"
+                  [disabled]="isSaving()"
+                  title="Delete closure"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
